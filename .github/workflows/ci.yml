@@ -21,9 +21,10 @@ jobs:
         run: |
           if ($env:RUNNER_DEBUG) { $global:VerbosePreference = 'Continue' }
 
-          $psResourceGetVersion = '0.9.0-rc1'
-          if (-not (Import-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersion.Split('-')[0] -Force -PassThru -ErrorAction SilentlyContinue)) {
-              Install-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersion -Force -AllowClobber -SkipPublisherCheck -AllowPrerelease
+          $psResourceGetVersionString = '0.9.0-rc1'
+          $psResourceGetVersion = $psResourceGetVersionString.Split('-')[0]
+          if (-not (Import-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersion -Force -PassThru -ErrorAction SilentlyContinue)) {
+              Install-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersionString -Force -AllowClobber -SkipPublisherCheck -AllowPrerelease
               'PowerShellGet', 'Microsoft.PowerShell.PSResourceGet' | Remove-Module -Force -ErrorAction SilentlyContinue
               Import-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersion -Force
           }
