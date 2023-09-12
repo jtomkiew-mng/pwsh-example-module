@@ -8,6 +8,7 @@ on:
 jobs:
   import-module:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
@@ -46,5 +47,5 @@ jobs:
           Install-PSResource -Name 'lowercasemodule' -Repository $packageSource.Name -Credential $cred -TrustRepository
           Install-PSResource -Name 'PascalCaseModule' -Repository $packageSource.Name -Credential $cred -TrustRepository
 
-          Import-Module 'lowercasemodule' -Force
-          Import-Module 'PascalCaseModule' -Force
+          Import-Module 'lowercasemodule' -Force -Verbose
+          Import-Module 'PascalCaseModule' -Force -Verbose
