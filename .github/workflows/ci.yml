@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  import-module:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import modules after installing with PSResourceGet
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          if ($env:RUNNER_DEBUG) { $global:VerbosePreference = 'Continue' }
+
+          $psResourceGetVersion = '0.9.0-rc1'
+          if (-not (Import-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersion.Split('-')[0] -Force -PassThru -ErrorAction SilentlyContinue)) {
+              Install-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersion -Force -AllowClobber -SkipPublisherCheck -AllowPrerelease
+              'PowerShellGet', 'Microsoft.PowerShell.PSResourceGet' | Remove-Module -Force -ErrorAction SilentlyContinue
+              Import-Module -Name 'Microsoft.PowerShell.PSResourceGet' -RequiredVersion $psResourceGetVersion -Force
+          }
+
+          $packageSource = @{
+              Name = "github/$env:GITHUB_REPOSITORY_OWNER"
+              Uri  = "https://nuget.pkg.github.com/$env:GITHUB_REPOSITORY_OWNER/index.json"
+          }
+          $repo = Get-PSResourceRepository | Where-Object { $_.Uri -eq $packageSource.Uri }
+          if ($repo) {
+              $packageSource.Name = $repo.Name
+          }
+          else {
+              Register-PSResourceRepository @packageSource -Force
+          }
+
+          $cred = [PSCredential]::new('github', (ConvertTo-SecureString -String $env:GITHUB_TOKEN -AsPlainText -Force))
+
+          Install-PSResource -Name 'lowercasemodule' -Repository $packageSource.Name -Credential $cred -TrustRepository
+          Install-PSResource -Name 'PascalCaseModule' -Repository $packageSource.Name -Credential $cred -TrustRepository
+
+          Import-Module 'lowercasemodule' -Force
+          Import-Module 'PascalCaseModule' -Force
