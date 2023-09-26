@@ -23,6 +23,7 @@ jobs:
     - name: Import modules after installing with PSResourceGet
       shell: pwsh
       env:
+        LANG: en-US.UTF-8
         GITHUB_TOKEN: ${{ github.token }}
         GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
       run: |
