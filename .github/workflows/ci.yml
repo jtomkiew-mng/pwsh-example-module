@@ -50,7 +50,7 @@ jobs:
         $cred = [PSCredential]::new('github', (ConvertTo-SecureString -String $env:GITHUB_TOKEN -AsPlainText -Force))
 
         Install-PSResource -Name 'lowercasemodule' -Repository $packageSource.Name -Credential $cred -TrustRepository
-        Install-PSResource -Name 'PascalCaseModule' -Repository $packageSource.Name -Credential $cred -TrustRepository
+        Install-PSResource -Name 'pascalcasemodule' -Repository $packageSource.Name -Credential $cred -TrustRepository
 
         Import-Module 'lowercasemodule' -Force -Verbose
         Import-Module 'pascalcasemodule' -Force -Verbose
