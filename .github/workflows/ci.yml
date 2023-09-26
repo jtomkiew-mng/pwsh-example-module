@@ -53,7 +53,7 @@ jobs:
         Install-PSResource -Name 'PascalCaseModule' -Repository $packageSource.Name -Credential $cred -TrustRepository
 
         Import-Module 'lowercasemodule' -Force -Verbose
-        Import-Module 'PascalCaseModule' -Force -Verbose
+        Import-Module 'pascalcasemodule' -Force -Verbose
     - name: Upload installed modules
       if: |
         matrix.os == 'ubuntu-latest' &&
